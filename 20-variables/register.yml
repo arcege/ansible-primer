@@ -1,0 +1,43 @@
+---
+
+- name: Register variables
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+    - command: whoami
+      register: who
+    - debug:
+        var=who.stdout
+    - debug:
+        var=who
+
+    - debug:
+        var: file1
+    - stat:
+        path: nosuchfile
+      register: file1
+
+    - debug:
+        var: file1.stat
+
+    - stat:
+        path: nodes.yml
+      register: file2
+    - debug:
+        var: file2.stat
+
+    - stat:
+        path: "{{ item }}"
+      loop:
+        - ghost.yml
+        - nodes.yml
+        - register.yml
+        - variables.yml
+      register: files3
+    - debug:
+        var: files3
+    - debug:
+        msg: "{{ item.item }} does not exist"
+      when: not item.stat.exists
+      loop: "{{ files3.results }}"

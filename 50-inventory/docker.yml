@@ -1,0 +1,16 @@
+---
+
+plugin: community.docker.docker_containers
+connection_type: docker-api
+
+verbose_output: true
+
+keyed_groups:
+  - prefix: group
+    key: 'docker_config.Labels["group"]'
+
+groups:
+    app: 'docker_config.Labels["group"] in ["webapp", "database"]'
+
+compose:
+  inventory_hostname: 'docker_config.Labels["name"]'

@@ -1,0 +1,68 @@
+---
+
+- name: Play variables
+  hosts: 20-variables-centos
+  gather_facts: false
+  vars:
+    app: cat
+  tasks:
+    - name: Not dog
+      debug:
+        var: app
+
+
+- name: Play varsfiles
+  hosts: 20-variables-amazon
+  gather_facts: false
+  vars_files:
+    - vars/system-amazon.yml
+
+  tasks:
+    - name: Not relay
+      debug:
+        var: app
+
+- name: Play include_vars
+  hosts: 20-variables-ubuntu
+  gather_facts: false
+  tasks:
+    - name: Load local variables
+      include_vars: vars/system-ubuntu.yml
+
+    - name: Not excel
+      debug:
+        var: app
+
+- name: First come
+  hosts: lesson_002_variables
+  gather_facts: true
+  tasks:
+    - name: Find closest match
+      include_vars: "{{ item }}"
+      with_first_found:
+        - vars/os-{{ ansible_distribution }}.yml
+        - vars/family-{{ ansible_os_family }}.yml
+        - vars/default.yml
+    - name: Show closest match
+      debug:
+        var: meal
+
+- name: Host vars
+  hosts: lesson_002_variables
+  gather_facts: false
+  tasks:
+    - name: Where
+      debug:
+        var: location
+
+- name: Group vars
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Where
+      debug:
+        var: location
+
+    - name: Drink my friends, drink!
+      debug:
+        var: blood

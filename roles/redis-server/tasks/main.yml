@@ -1,0 +1,26 @@
+---
+
+- name: System dependent variables
+  # get variables based on the OS of the host
+  # `ansible_os_family` is a fact, c.f. `setup` and `gatnkher_facts`
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install packages
+  # must become root to performed
+  become: true
+  ansible.builtin.package:
+      name: "redis"
+
+- name: Enable redis service
+  become: true
+  ansible.builtin.service:
+      name: "{{ service_name }}"
+      enabled: true
+
+- name: Redis config template
+  become: true
+  ansible.builtin.template:
+      src: redis.conf.j2
+      dest: "{{ root_dir }}/redis.conf"
+  # restart when changed
+  notify: Restart redis server

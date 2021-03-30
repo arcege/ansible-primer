@@ -1,0 +1,11 @@
+bind 127.0.0.1
+protected-mode yes
+port {{ port }}
+tcp-backlog 511
+timeout 0
+tcp-keepalive 300
+pidfile /var/run/redis_6379.pid
+databases 16
+rdbcompression yes
+rdbchecksum yes
+dbfilename dump.rdb

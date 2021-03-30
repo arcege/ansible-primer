@@ -1,0 +1,60 @@
+---
+
+- name: Filters
+  hosts: lesson_20_variables
+  vars:
+    structure:
+      field_a: value_a
+      field_b: value_b
+    seq:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+
+  tasks:
+    - name: Change case
+      debug:
+        msg: "{{ ansible_os_family }} as lowercase {{ ansible_os_family | lower }}"
+
+    - debug: Output as json
+      debug:
+        msg: "raw: {{ structure }}; json: {{ structure | to_json }}"
+
+    - name: Comma separated
+      debug:
+        msg: "{{ seq | join(',') }}"
+
+    - name: First in the list
+      debug: "{{ seq | first }}"
+
+
+    - name: Create four files, one with spaces
+      file:
+        path: "{{ item }}"
+        state: touch
+      loop:
+        - "file with spaces"
+        - "file"
+        - "with"
+        - "spaces"
+
+    - name: Shell unquoted
+      diff: true
+      ansible.builtin.shell: "ls {{ filename }}"
+      vars:
+        filename: "file with spaces"
+      register: unquoted
+    - debug:
+        var: unquoted
+
+    - name: Shell quoted
+      diff: true
+      ansible.builtin.shell: "ls {{ filename | quote }}"
+      vars:
+        filename: "file with spaces"
+      register: quoted
+    - debug:
+        var: quoted

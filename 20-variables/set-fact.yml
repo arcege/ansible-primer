@@ -1,0 +1,35 @@
+---
+
+- name: Showing set_fact use
+  hosts: lesson_20_variables
+  gather_facts: false
+  vars:
+      sum: 0
+  pre_tasks:
+    - name: Ensure that the variable does not exist
+      ansible.builtin.assert:
+        that:
+          - my_blood_type is not defined
+          - sum == 0
+        quiet: true
+
+  tasks:
+    - name: Set my blood type and location
+      ansible.builtin.set_fact:
+        my_blood_type: "{{ location }}/{{ blood }}"
+
+    - ansible.builtin.debug:
+        var: my_blood_type
+
+    - name: Iterative accumulation
+      ansible.builtin.set_fact:
+        sum: "{{ sum }},{{ item * item }}"
+      loop:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+
+    - ansible.builtin.debug:
+        var: sum

@@ -1,0 +1,39 @@
+---
+# the playbook with local file and template
+# this is a minimal system, using local files
+# to populate the remote system
+#
+# Install Hashicorp Vault into the system
+#   - create destination as ~/bin on remote server
+#   - extract the binary from the zipfile stored on the caller
+#   - instantiate template from local copy
+
+- name: Lesson 1 - playbooks - local
+  hosts: 60-idempotence-local
+
+  tasks:
+    - name: Create Vault directories
+      # will not create if already exists
+      # will not update if permissions are already set
+      ansible.builtin.file:
+        state: directory
+        path: "{{ ansible_env.HOME }}/{{ item }}"
+        mode: 0755
+      loop:
+        - bin
+        - etc
+
+    - name: Extract binary
+      ansible.builtin.unarchive:
+        copy: true
+        src: "{{ playbook_dir }}/files/vault.zip"
+        dest: "{{ ansible_env.HOME }}/bin"
+        # will not unzip if this file already exists
+        creates: "{{ ansible_env.HOME }}/bin/vault"
+
+    - name: Create config file
+      # will not update if resulting in the same content
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/vault.hcl.j2"
+        dest: "{{ ansible_env.HOME }}/etc/vault.hcl"
+        mode: 0644

@@ -1,0 +1,42 @@
+---
+
+- name: Requirement
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Check gather variable
+      ansible.builtin.assert:
+        that:
+          - gather is defined
+          - gather in ('true', 'false', 'yes', 'no', true, false)
+        fail_msg: |
+            Please use '-e gather=true|false|yes|no|@file' on the command-line.
+
+# do _not_ load facts for each host in the play
+- name: Facts? {{ gather }}
+  hosts: all
+  gather_facts: "{{ gather }}"
+  tasks:
+    - name: CPU type
+      ansible.builtin.debug:
+        var: ansible_machine
+
+    - name: OS Type
+      ansible.builtin.debug:
+        var: ansible_os_family
+
+    - name: OS
+      ansible.builtin.debug:
+        var: ansible_distribution
+
+
+- name: Using hostvars facts
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: All the hosts OSs
+      ansible.builtin.debug:
+        # look at the fact on the current loop item's
+        var: hostvars[item].ansible_distribution
+      # convert the sequence of keys of the hostvars dict into a list
+      loop: "{{ hostvars.keys() | list }}"

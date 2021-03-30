@@ -1,0 +1,6 @@
+name: "1"
+nodes:
+  - name: ubuntu
+    image: primer-ubuntu
+  - name: amazon
+    image: primer-amazon

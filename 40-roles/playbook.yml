@@ -1,0 +1,23 @@
+---
+
+- name: Install nginx/redis servers
+  hosts: 40-roles-nginx1,40-roles-nginx2
+  # 'roles' instead of 'tasks'
+  roles:
+    - name: nginx-server
+      tags:
+        - nginx
+
+- name: Install redis servers
+  hosts: 40-roles-redis1,40-roles-redis2
+  # 'import_role' and 'include_role' are like the `roles` clause
+  # but within a task list
+  tasks:
+    - name: Install redis servers
+      ansible.builtin.import_role:
+        name: redis-server
+      vars:
+        # passing non-default values
+        port: 7379
+      tags:
+        - redis

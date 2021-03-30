@@ -1,0 +1,77 @@
+---
+# the playbook with loop
+# this is more complicated than 'straight',
+# but it is idempotent
+#
+# Install Hashicorp Vault into the system
+#   - create destination as ~/bin on remote server
+#   - download the zipfile to a tempfile
+#   - extract the binary from the zipfile
+
+- name: Lesson 1 - playbooks - variables and handler
+  hosts: 60-idempotence-remote
+
+  # variables available to the tasks/roles in this play
+  vars:
+    vault_url: https://releases.hashicorp.com/vault/1.7.0-rc1/vault_1.7.0-rc1_linux_amd64.zip
+
+  tasks:
+    - name: Create Vault directories
+      ansible.builtin.file:
+        state: directory
+        path: "{{ ansible_env.HOME }}/{{ item }}"
+        mode: 0755
+      # perform the tasks on multiple inputs
+      loop:
+        - bin
+        - etc
+
+    - name: Check vault binary
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/bin/vault"
+      # store result in a variable
+      register: vault_binary
+
+    - name: Tempfile for download
+      # run only if ~/bin/vault does not exist
+      when: not vault_binary.stat.exists
+      ansible.builtin.tempfile:
+      register: zipfile
+
+    - name: Download vault
+      when: not vault_binary.stat.exists
+      ansible.builtin.get_url:
+        url: "{{ vault_url }}"
+        dest: "{{ zipfile.path }}"
+        force: true
+      # signal to run a handler at the end of the play
+      notify: Cleanup download
+      # notice that the handler is for when the temp file
+      # is created, not when it is defined above
+
+    - name: Extract bindary
+      when: not vault_binary.stat.exists
+      ansible.builtin.unarchive:
+        src: "{{ zipfile.path }}"
+        dest: "{{ ansible_env.HOME }}/bin"
+        remote_src: true
+
+    - name: Vault config
+      ansible.builtin.copy:
+        # inline yaml data
+        content: |
+            # contents
+            listener "tcp" {
+                address     = " 127.0.0.1:8200"
+                tls_disable = 1
+            }
+        dest: "{{ ansible_env.HOME }}/etc/vault.hcl"
+
+  # handlers run when the play finished
+  # ONLY if there is a 'notify' directive run
+  # other handlers are ignored
+  handlers:
+    - name: Cleanup download
+      ansible.builtin.file:
+        state: absent
+        path: "{{ zipfile.path }}"
