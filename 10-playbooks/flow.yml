@@ -1,0 +1,68 @@
+---
+# the playbook is the whole file
+# a collection of plays
+# a play is a collection of tasks
+
+# a play operates on hosts
+
+- name: Lesson 1 - flow
+  # a list of hosts to perform against
+  # this is a host group (run with `--list-hosts`)
+  hosts: lesson_001_playbooks
+
+  # list of tasks to perform
+  tasks:
+    # the items are tasks:
+    # each tasks is a module that would run on each host
+    # modules and arguments are copied to remote host and
+    # executed; response is returned to calling server
+
+    # human name for the output
+    - name: Who am i
+      # do not report as changed, information only
+      changed_when: false
+      # run ['id'] on the remote machine, fork/exec, not shell
+      ansible.builtin.command: id
+
+    - name: Copy the passwd file
+      ansible.builtin.copy:
+        # source is a local file
+        src: /etc/passwd
+        # dest is a remote file
+        dest: /tmp/passwd
+        # change the permissions
+        mode: 0700
+
+    - name: Add Larry User
+      # become 'root' (or another user)
+      become: true
+      ansible.builtin.user:
+        name: luser
+        comment: Larry User
+        home: /usr/luser
+        create_home: true
+        shell: /bin/bash
+
+    - name: Run grep
+      changed_when: false
+      ansible.builtin.command: grep '^luser:' /etc/passwd
+
+    - name: Add/change line to config file
+      ansible.builtin.lineinfile:
+        state: present
+        path: /tmp/ansible.cnf
+        create: true
+        regexp: '^program=.*$'
+        # Ansible uses Jinga2 templates
+        line: "program={{ ansible_python.executable }}"
+
+    - name: Pull file from remote into a variable
+      ansible.builtin.slurp:
+        src: /tmp/ansible.cnf
+      # stores module output to each host's variable named `ansible_cnf_file`
+      register: ansible_cnf_file
+
+    - name: Show remote file
+      # display a message to the user, for each host
+      ansible.builtin.debug:
+        msg: "{{ ansible_cnf_file['content'] | b64decode | trim }}"

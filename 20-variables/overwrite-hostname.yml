@@ -1,0 +1,15 @@
+---
+
+- name: Overwritting Ansible predefined variables
+  hosts: lesson_002_variables
+  gather_facts: false
+  tasks:
+    - name: This will succeed
+      ansible.builtin.command: "true"
+
+    - name: Overwrite the host name
+      ansible.builtin.set_fact:
+        ansible_host: "{{ blood }}"
+
+    - name: This will fail as unreachable
+      ansible.builtin.command: "true"

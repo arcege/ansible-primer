@@ -1,0 +1,8 @@
+name: '2'
+nodes:
+  - name: straight
+    image: primer-ubuntu
+  - name: remote
+    image: primer-ubuntu
+  - name: local
+    image: primer-ubuntu

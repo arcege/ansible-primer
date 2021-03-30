@@ -1,0 +1,33 @@
+---
+
+- name: Register variables
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: cha-cha-changes
+      command: "true"
+      register: truth_true
+    - debug:
+        msg: "truth_true.changed = {{ truth_true is changed }}; truth_true.failed = {{ truth_true is failed }}"
+
+    - name: who's a failure?
+      command: "false"
+      ignore_errors: true
+      register: truth_false
+    - debug:
+        msg: "truth_false.changed = {{ truth_false is changed }}; truth_false.failed = {{ truth_false is failed }}"
+
+    - name: no-no cha-cha-changes
+      command: "true"
+      changed_when: false
+      register: truth_psych
+    - debug:
+        msg: "truth_psych.changed = {{ truth_psych.changed }}; truth_false.failed = {{ truth_psych.failed }}"
+
+    - name: it failed, but it didn't?
+      command: "false"
+      failed_when: false
+      ignore_errors: true
+      register: truth_insanity
+    - debug:
+        msg: "truth_insanity.changed = {{ truth_insanity.changed }}; truth_false.failed = {{ truth_insanity.failed }}"

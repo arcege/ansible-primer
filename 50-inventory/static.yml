@@ -1,0 +1,35 @@
+all:
+  hosts:
+    webapp1:
+      install_dir: /usr/local
+    webapp2:
+    webapp3:
+    dbsvr1:
+    dbsvr2:
+    dns01:
+    dns11:
+
+  vars:
+    ansible_connection: docker
+
+  children:
+    app:
+
+      children:
+        group_webapp:
+          hosts:
+            webapp1:
+            webapp2:
+            webapp3:
+
+        group_database:
+          hosts:
+            dbsvr1:
+            dbsvr2:
+
+    group_dns:
+      hosts:
+        dns01:
+        dns11:
+      vars:
+        ns: app-dns.ansible-primer.com

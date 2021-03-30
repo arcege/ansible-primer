@@ -1,0 +1,62 @@
+---
+# the playbook with variables and a handler
+# this is a straight-forward playbook of the tasks
+# but it is _not_ idempotent
+#
+# Install Hashicorp Vault into the system
+#   - create destination as ~/bin on remote server
+#   - download the zipfile to a tempfile
+#   - extract the binary from the zipfile
+
+- name: Lesson 1 - playbooks - variables and handler
+  hosts: 60-idempotence-straight
+
+  vars:
+    vault_url: https://releases.hashicorp.com/vault/1.7.0-rc1/vault_1.7.0-rc1_linux_amd64.zip
+
+  tasks:
+    - name: Create bin directory
+      ansible.builtin.file:
+        state: directory
+        path: "{{ ansible_env.HOME }}/bin"
+        mode: 0755
+
+    - name: Create etc directory
+      ansible.builtin.file:
+        state: directory
+        path: "{{ ansible_env.HOME }}/etc"
+        mode: 0755
+
+    - name: Tempfile for download
+      ansible.builtin.tempfile:
+      register: zipfile
+
+    - name: Download vault
+      ansible.builtin.get_url:
+        url: "{{ vault_url }}"
+        dest: "{{ zipfile.path }}"
+        force: true
+      notify: Cleanup download
+
+    - name: Extract bindary
+      ansible.builtin.unarchive:
+        src: "{{ zipfile.path }}"
+        dest: "{{ ansible_env.HOME }}/bin"
+        remote_src: true
+        creates: "{{ ansible_env.HOME }}/bin/vault"
+
+    - name: Vault config
+      ansible.builtin.copy:
+        content: |
+            # contents
+            listener "tcp" {
+                address     = " 127.0.0.1:8200"
+                tls_disable = 1
+            }
+        dest: "{{ ansible_env.HOME }}/etc/vault.hcl"
+
+  handlers:
+    - name: Cleanup download
+      ansible.builtin.file:
+        state: absent
+        path: "{{ zipfile.path }}"

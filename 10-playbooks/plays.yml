@@ -1,0 +1,47 @@
+---
+# multiple plays
+# for the fist part, we assume that python has not been
+# installed, therefore standard Ansible packages would fail
+# we need to install python manually before hand
+
+- name: Lesson 1 - plays - python3 install
+  hosts: all:!localhost
+  # do not implicitly get facts
+  gather_facts: false
+  pre_tasks:
+    - name: Force python3 to be installed
+      raw: "command -v yum && sudo yum install -y python3 || sudo apt-get install -y python3"
+      register: pyinst
+      changed_when: "'already' not in pyinst.stdout"
+
+  tasks:
+    - name: Now gather facts
+      ansible.builtin.setup:
+
+    - name: Install pip (redhat)
+      become: true
+      when: ansible_os_family == 'RedHat'
+      ansible.builtin.yum:
+        state: present
+        name: python3-pip
+
+    - name: Install pip (debian)
+      become: true
+      when: ansible_os_family == 'Debian'
+      ansible.builtin.apt:
+        state: present
+        name: python3-pip
+
+- name: Lesson 1 - plays - localhost
+  hosts: localhost
+  tasks:
+    - ansible.builtin.find:
+        paths: "{{ ansible_env.PWD }}"
+        patterns: "*.yml"
+      register: local_yaml
+
+    - name: Local yaml files found
+      when: "'.yml' in item.path"
+      debug:
+        msg: "{{ item.path | basename }}"
+      loop: "{{ local_yaml.files }}"

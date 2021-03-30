@@ -1,0 +1,11 @@
+---
+
+name: '2'
+
+nodes:
+  - name: ubuntu
+    image: primer-ubuntu
+  - name: centos
+    image: primer-centos
+  - name: amazon
+    image: primer-amazon

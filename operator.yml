@@ -1,0 +1,168 @@
+---
+# external variables:
+# operation - what to perform (see below)
+# lesson - where the 'nodes.yml' file should be found
+#     this is cached in the `.current` file at the top directory
+#
+#  operation is one of the following:
+#    start     - build and start the nodes for this lesson (default)
+#    stop      - stop and remove the nodes for the current lesson
+#    restart   - stop the current nodes and start new ones
+#    rebuild   - stop the current nodes, rebuild the images and start new nodes
+#    finish    - stop the current nodes, remove images and remove .current file
+
+- name: Setup containers for lesson
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    current_file: "{{ playbook_dir }}/.current"
+    ssh_keyfile: "docker/ssh-key"
+    images:
+      - name: primer-ubuntu
+        image: ubuntu:focal
+      - name: primer-amazon
+        image: amazonlinux:2
+      - name: primer-centos
+        image: centos:8
+    operation: start
+    to_start:
+      - start
+      - restart
+      - rebuild
+    to_build:
+      - rebuild
+    to_stop:
+      - stop
+      - restart
+    to_remove:
+      - finish
+      - rebuild
+    current: ""
+
+  tasks:
+
+    - name: Cached lesson
+      failed_when: false
+      ansible.builtin.slurp:
+        src: "{{ current_file }}"
+      register: current_lesson_file
+
+    - name: Current lesson
+      when: current_lesson_file.content is defined
+      set_fact:
+        current: "{{ current_lesson_file.content | b64decode | trim }}"
+
+    - name: Check for a lesson
+      when: current == "" and lesson is not defined
+      fail:
+        msg: "Must supply `lesson`"
+
+    - name: Check that some lesson exists
+      when: lesson is not defined
+      set_fact:
+        lesson: "{{ current }}"
+
+    - name: This lesson
+      debug:
+        msg: "The lesson setup is {{ lesson }}"
+
+    - name: Load new lesson nodes
+      include_vars:
+        file: "{{ playbook_dir }}/{{ lesson }}/nodes.yml"
+        name: this
+
+    - name: Load current lesson nodes
+      when: current != ""
+      include_vars:
+        file: "{{ playbook_dir }}/{{ current }}/nodes.yml"
+        name: old
+
+    - name: Generate SSH key
+      community.crypto.openssh_keypair:
+        path: "{{ ssh_keyfile }}"
+        comment: "primer key"
+        mode: 0700
+        size: 1024
+        type: "rsa"
+      register: sshkey
+
+    - name: Stop the containers
+      when: operation in (to_stop + to_remove) or current != lesson or sshkey is changed
+      failed_when: false
+      community.docker.docker_container:
+        state: "absent"
+        name: "{{ item.altname | default(lesson + '-' + item.name) }}"
+      loop: "{{ (old is defined) | ternary(old.nodes, []) }}"
+
+    - name: Remove the images
+      when: operation in to_remove or sshkey is changed
+      community.docker.docker_image:
+        state: absent
+        source: local
+        name: "{{ item.name }}"
+      loop: "{{ images }}"
+
+    - name: Remove base images
+      when: operation == 'finish'
+      community.docker.docker_image:
+        state: absent
+        name: "{{ item.image }}"
+      loop: "{{ images }}"
+
+    - name: Build images
+      when: operation in (to_build + to_start)
+      block:
+
+        - name: Pull base image
+          community.docker.docker_image:
+            name: "{{ item.image }}"
+            source: pull
+          loop: "{{ images }}"
+
+        - name: Build docker images
+          community.docker.docker_image:
+            state: present
+            name: "{{ item.name }}"
+            source: build
+            force_source: "{{ operation in to_build }}"
+            build:
+              path: "docker"
+              args:
+                BASEIMAGE: "{{ item.image }}"
+          loop: "{{ images }}"
+
+    - name: Start docker containers
+      when: operation in to_start
+      community.docker.docker_container:
+        state: started
+        # use altname or '{lesson}-{name}"
+        name: "{{ item.altname | default(lesson + '-' + item.name) }}"
+        image: "{{ item.image }}"
+        # merge node's 'labels' with standard labels
+        labels: "{{ item.labels | default({}) | combine(local_labels) }}"
+        stop_timeout: 100
+        mounts:
+          - type: tmpfs
+            target: /tmp
+        privileged: true
+        exposed_ports: "{{ this.nodes.ports | default(omit) }}"
+      loop: "{{ this.nodes }}"
+      vars:
+          local_labels:
+              app: ansible-primer
+              lesson: "{{ lesson }}"
+              name: "{{ item.name }}"
+
+    - name: Save lesson
+      when: current != lesson and operation != 'finish'
+      ansible.builtin.copy:
+        content: "{{ lesson }}\n"
+        dest: "{{ current_file }}"
+
+    - name: Cleanup
+      when: operation == "finish"
+      file:
+        state: absent
+        path: "{{ current_file }}"
+
