@@ -33,6 +33,12 @@ In the top level of the directory, load the init.sh script.
 
 This will create and activate a Python Virtualenv and populate it with the tools needed.
 
+### Completion
+
+When finished with the lessons, you can tear down the environment using:
+
+    $ ansible-playbook operator.yml -e operation=finish
+
 ## Environment
 
 The primer uses Docker to create containers used during each lesson.  In each lesson,
