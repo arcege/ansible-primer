@@ -50,7 +50,7 @@ be specified on the command-line.
 # Lessons
 
 Each lesson will have a `README.md` file that walks the user through the steps.
-Some steps will be manual to who the difficulty, but most will be running Ansible
+Some steps may be manual to show the difficulty, but most will be running Ansible
 commands.
 
 ## Failures

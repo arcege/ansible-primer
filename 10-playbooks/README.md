@@ -27,10 +27,8 @@ variables, global and host specific.
 
 # Lesson
 
-## book1
-
-There is little point to the playbook as a whole, except to show various parts of the
-playbook and how they work together.
+There is little point to the `plays.yml` playbook as a whole, except to show
+various parts of the playbook and how they work together.
 
 ### Names
 
