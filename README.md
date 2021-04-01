@@ -7,7 +7,9 @@ This is meant to be an excelerated lesson for learning Ansible.
 
     source init.sh
     ansible-playbook operator.yml -e lesson=10-playbooks
-    ansible-playbook 10-playbooks/book1.yml
+    ansible-playbook 10-playbooks/plays.yml
+    ansible-playbook 10-playbooks/flow.yml
+    ansible-playbook 10-playbooks/task-status.yml
     ansible-playbook operator.yml -e lesson=20-variables
     ...
 
