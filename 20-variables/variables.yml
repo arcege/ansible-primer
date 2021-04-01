@@ -34,7 +34,7 @@
         var: app
 
 - name: First come
-  hosts: lesson_002_variables
+  hosts: lesson_20_variables
   gather_facts: true
   tasks:
     - name: Find closest match
@@ -48,7 +48,7 @@
         var: meal
 
 - name: Host vars
-  hosts: lesson_002_variables
+  hosts: lesson_20_variables
   gather_facts: false
   tasks:
     - name: Where

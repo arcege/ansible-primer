@@ -47,11 +47,17 @@
       ansible.builtin.slurp:
         src: "{{ current_file }}"
       register: current_lesson_file
+      tags:
+        - setup
+        - no-cache
 
     - name: Current lesson
-      when: current_lesson_file.content is defined
+      when: current_lesson_file is defined and current_lesson_file.content is defined
       set_fact:
         current: "{{ current_lesson_file.content | b64decode | trim }}"
+      tags:
+        - setup
+        - no-cache
 
     - name: Check for a lesson
       when: current == "" and lesson is not defined
@@ -62,6 +68,8 @@
       when: lesson is not defined
       set_fact:
         lesson: "{{ current }}"
+      tags:
+        - setup
 
     - name: This lesson
       debug:
@@ -71,12 +79,16 @@
       include_vars:
         file: "{{ playbook_dir }}/{{ lesson }}/nodes.yml"
         name: this
+      tags:
+        - setup
 
     - name: Load current lesson nodes
       when: current != ""
       include_vars:
         file: "{{ playbook_dir }}/{{ current }}/nodes.yml"
         name: old
+      tags:
+        - setup
 
     - name: Generate SSH key
       community.crypto.openssh_keypair:
@@ -86,14 +98,19 @@
         size: 1024
         type: "rsa"
       register: sshkey
+      tags:
+        - setup
 
     - name: Stop the containers
       when: operation in (to_stop + to_remove) or current != lesson or sshkey is changed
       failed_when: false
       community.docker.docker_container:
         state: "absent"
-        name: "{{ item.altname | default(lesson + '-' + item.name) }}"
+        name: "{{ item.altname | default(current + '-' + item.name) }}"
+        container_default_behavior: compatibility
       loop: "{{ (old is defined) | ternary(old.nodes, []) }}"
+      tags:
+        - vms
 
     - name: Remove the images
       when: operation in to_remove or sshkey is changed
@@ -102,6 +119,8 @@
         source: local
         name: "{{ item.name }}"
       loop: "{{ images }}"
+      tags:
+        - images
 
     - name: Remove base images
       when: operation == 'finish'
@@ -109,9 +128,13 @@
         state: absent
         name: "{{ item.image }}"
       loop: "{{ images }}"
+      tags:
+        - images
 
     - name: Build images
       when: operation in (to_build + to_start)
+      tags:
+        - images
       block:
 
         - name: Pull base image
@@ -153,12 +176,16 @@
               app: ansible-primer
               lesson: "{{ lesson }}"
               name: "{{ item.name }}"
+      tags:
+        - vms
 
     - name: Save lesson
       when: current != lesson and operation != 'finish'
       ansible.builtin.copy:
         content: "{{ lesson }}\n"
         dest: "{{ current_file }}"
+      tags:
+        - state
 
     - name: Cleanup
       when: operation == "finish"

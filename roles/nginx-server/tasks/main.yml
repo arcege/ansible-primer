@@ -28,9 +28,14 @@
         state: directory
         path: "/var/log/journal"
 
+    - name: Journal file
+      stat:
+        path: "/var/log/journal/nginx.service.log"
+      register: journal
+
     - name: Create journal file
-      when: ansible_os_family == "RedHat"
+      when: ansible_os_family == "RedHat" and not journal.stat.exists
       ansible.builtin.file:
         state: touch
-        path: "/var/log/journal/nginx.service.log"
+        path: journal.stat.path
         owner: nginx

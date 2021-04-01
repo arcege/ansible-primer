@@ -1,36 +1,19 @@
 ---
 # multiple plays
-# for the fist part, we assume that python has not been
-# installed, therefore standard Ansible packages would fail
-# we need to install python manually before hand
 
-- name: Lesson 1 - plays - python3 install
+- name: Lesson 1 - plays - install nginx
   hosts: all:!localhost
-  # do not implicitly get facts
-  gather_facts: false
-  pre_tasks:
-    - name: Force python3 to be installed
-      raw: "command -v yum && sudo yum install -y python3 || sudo apt-get install -y python3"
-      register: pyinst
-      changed_when: "'already' not in pyinst.stdout"
-
   tasks:
-    - name: Now gather facts
-      ansible.builtin.setup:
-
-    - name: Install pip (redhat)
+    - name: Install nginx
       become: true
-      when: ansible_os_family == 'RedHat'
-      ansible.builtin.yum:
-        state: present
-        name: python3-pip
+      package:
+        name: nginx
 
-    - name: Install pip (debian)
+    - name: Start nginx
       become: true
-      when: ansible_os_family == 'Debian'
-      ansible.builtin.apt:
-        state: present
-        name: python3-pip
+      service:
+        name: nginx
+        state: started
 
 - name: Lesson 1 - plays - localhost
   hosts: localhost

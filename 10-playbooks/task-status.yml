@@ -4,30 +4,30 @@
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: cha-cha-changes
+    - name: cha-cha-changes (truth_true)
       command: "true"
       register: truth_true
     - debug:
         msg: "truth_true.changed = {{ truth_true is changed }}; truth_true.failed = {{ truth_true is failed }}"
 
-    - name: who's a failure?
+    - name: who's a failure? (truth_false)
       command: "false"
       ignore_errors: true
       register: truth_false
     - debug:
         msg: "truth_false.changed = {{ truth_false is changed }}; truth_false.failed = {{ truth_false is failed }}"
 
-    - name: no-no cha-cha-changes
+    - name: no-no cha-cha-changes (truth_psych)
       command: "true"
       changed_when: false
       register: truth_psych
     - debug:
-        msg: "truth_psych.changed = {{ truth_psych.changed }}; truth_false.failed = {{ truth_psych.failed }}"
+        msg: "truth_psych.changed = {{ truth_psych.changed }}; truth_psych.failed = {{ truth_psych.failed }}"
 
-    - name: it failed, but it didn't?
+    - name: it failed, but it didn't? (truth_insanity)
       command: "false"
       failed_when: false
       ignore_errors: true
       register: truth_insanity
     - debug:
-        msg: "truth_insanity.changed = {{ truth_insanity.changed }}; truth_false.failed = {{ truth_insanity.failed }}"
+        msg: "truth_insanity.changed = {{ truth_insanity.changed }}; truth_insanity.failed = {{ truth_insanity.failed }}"

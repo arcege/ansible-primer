@@ -1,7 +1,7 @@
 ---
 
 - name: Overwritting Ansible predefined variables
-  hosts: lesson_002_variables
+  hosts: lesson_20_variables
   gather_facts: false
   tasks:
     - name: This will succeed
