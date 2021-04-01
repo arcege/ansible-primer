@@ -8,7 +8,7 @@
 - name: Lesson 1 - flow
   # a list of hosts to perform against
   # this is a host group (run with `--list-hosts`)
-  hosts: lesson_10_playbooks
+  hosts: playbooks
 
   # list of tasks to perform
   tasks:

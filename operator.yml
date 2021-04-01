@@ -106,7 +106,7 @@
       failed_when: false
       community.docker.docker_container:
         state: "absent"
-        name: "{{ item.altname | default(current + '-' + item.name) }}"
+        name: "{{ item.altname | default(old.name + '-' + item.name) }}"
         container_default_behavior: compatibility
       loop: "{{ (old is defined) | ternary(old.nodes, []) }}"
       tags:
@@ -160,7 +160,7 @@
       community.docker.docker_container:
         state: started
         # use altname or '{lesson}-{name}"
-        name: "{{ item.altname | default(lesson + '-' + item.name) }}"
+        name: "{{ item.altname | default(this.name + '-' + item.name) }}"
         image: "{{ item.image }}"
         # merge node's 'labels' with standard labels
         labels: "{{ item.labels | default({}) | combine(local_labels) }}"
@@ -174,7 +174,7 @@
       vars:
           local_labels:
               app: ansible-primer
-              lesson: "{{ lesson }}"
+              lesson: "{{ this.name }}"
               name: "{{ item.name }}"
       tags:
         - vms

@@ -9,7 +9,7 @@
 #   - instantiate template from local copy
 
 - name: Lesson 1 - playbooks - local
-  hosts: 60-idempotence-local
+  hosts: idempotence-local
 
   tasks:
     - name: Create Vault directories

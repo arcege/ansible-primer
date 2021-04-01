@@ -1,7 +1,7 @@
 ---
 
 - name: Filters
-  hosts: lesson_20_variables
+  hosts: variables
   vars:
     structure:
       field_a: value_a

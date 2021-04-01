@@ -19,10 +19,10 @@ Examples:
     ansible all -m ansible.builtin.ping
 
     # show system facts of each host
-    ansible lesson_30_adhoc -m ansible.builtin.setup
+    ansible adhoc -m ansible.builtin.setup
 
     # show OS family from facts of each host
-    ansible lesson_30_adhoc -m ansible.builtin.setup -a filter=ansible_os_family
+    ansible adhoc -m ansible.builtin.setup -a filter=ansible_os_family
 
 ## Remote command execution
 
@@ -42,10 +42,10 @@ All three return the stdout and stderr, both as single strings and as lists of l
 Examples:
 
     # run a command on each host
-    ansible lesson_30_adhoc -a id
+    ansible adhoc -a id
 
     # run a bash command (with glob)
-    ansible lesson_30_adhoc -m ansible.builtin.shell -a 'ls -d /proc/[0-9]*/'
+    ansible adhoc -m ansible.builtin.shell -a 'ls -d /proc/[0-9]*/'
 
 ## Calling modules
 
@@ -60,14 +60,14 @@ fairly useless and others are only useful from adhoc commands.
 Examples:
 
     # install a package (failure - no permissions)
-    ansible lesson_30_adhoc -m package -a name=redis
+    ansible adhoc -m package -a name=redis
     # install a package becoming root user
-    ansible lesson_30_adhoc -b -m package -a name=redis
+    ansible adhoc -b -m package -a name=redis
 
     # enable service (ubuntu fails)
-    ansible lesson_30_adhoc -b -m service -a 'enabled=true name=redis'
+    ansible adhoc -b -m service -a 'enabled=true name=redis'
     # enable service (redhat fails)
-    ansible lesson_30_adhoc -b -m service -a 'enabled=true name=redis-server'
+    ansible adhoc -b -m service -a 'enabled=true name=redis-server'
 
 
 # Common ad-hoc only modules

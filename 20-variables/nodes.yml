@@ -1,6 +1,6 @@
 ---
 
-name: '2'
+name: 'variables'
 
 nodes:
   - name: ubuntu

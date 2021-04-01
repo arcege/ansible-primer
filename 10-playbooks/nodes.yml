@@ -1,4 +1,7 @@
-name: "1"
+---
+
+name: "playbooks"
+
 nodes:
   - name: ubuntu
     image: primer-ubuntu

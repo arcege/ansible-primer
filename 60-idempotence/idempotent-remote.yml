@@ -9,7 +9,7 @@
 #   - extract the binary from the zipfile
 
 - name: Lesson 1 - playbooks - variables and handler
-  hosts: 60-idempotence-remote
+  hosts: idempotence-remote
 
   # variables available to the tasks/roles in this play
   vars:

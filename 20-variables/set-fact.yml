@@ -1,7 +1,7 @@
 ---
 
 - name: Showing set_fact use
-  hosts: lesson_20_variables
+  hosts: variables
   gather_facts: false
   vars:
       sum: 0
@@ -18,7 +18,8 @@
       ansible.builtin.set_fact:
         my_blood_type: "{{ location }}/{{ blood }}"
 
-    - ansible.builtin.debug:
+    - name: Show my_blood_type
+      ansible.builtin.debug:
         var: my_blood_type
 
     - name: Iterative accumulation
@@ -31,5 +32,6 @@
         - 4
         - 5
 
-    - ansible.builtin.debug:
+    - name: Show sum
+      ansible.builtin.debug:
         var: sum

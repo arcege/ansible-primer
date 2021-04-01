@@ -1,4 +1,6 @@
-name: "5"
+---
+
+name: "inventory"
 
 nodes:
   - name: webapp1

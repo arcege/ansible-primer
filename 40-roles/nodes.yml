@@ -1,13 +1,21 @@
 ---
 
-name: '4'
+name: 'roles'
 
 nodes:
   - name: nginx1
     image: primer-centos
+    labels:
+      group: webapp
   - name: nginx2
     image: primer-ubuntu
+    labels:
+      group: webapp
   - name: redis1
     image: primer-centos
+    labels:
+      group: database
   - name: redis2
     image: primer-ubuntu
+    labels:
+      group: database

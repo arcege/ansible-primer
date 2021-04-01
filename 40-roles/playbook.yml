@@ -1,7 +1,7 @@
 ---
 
 - name: Install nginx/redis servers
-  hosts: 40-roles-nginx1,40-roles-nginx2
+  hosts: webapp
   # 'roles' instead of 'tasks'
   roles:
     - name: nginx-server
@@ -9,7 +9,7 @@
         - nginx
 
 - name: Install redis servers
-  hosts: 40-roles-redis1,40-roles-redis2
+  hosts: database
   # 'import_role' and 'include_role' are like the `roles` clause
   # but within a task list
   tasks:

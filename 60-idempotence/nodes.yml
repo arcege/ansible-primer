@@ -1,4 +1,7 @@
-name: '2'
+---
+
+name: 'idempotence'
+
 nodes:
   - name: straight
     image: primer-ubuntu
