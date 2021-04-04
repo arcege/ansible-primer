@@ -1,17 +1,35 @@
 ---
+# an inventory plugin configuration file
 
+# the plugin to use
 plugin: community.docker.docker_containers
 
 verbose_output: true
 
+# this creates host groups using values in the host's
+# host vars (at the time of initialization, not using
+# values modified during execution)
+# values used in the group name are all normalized
+# by changing hyphens ("-") to underscores ("_")
 keyed_groups:
+
+  # create groups based on the docker image used,
+  # the group name is prefixed with `image_`
+  # and as mentioned above, hyphens are translated
+  # for example, `image_primer_centos`
+  - prefix: image
+    key: docker_config.Image
+
+
+  # create groups based on the containers' 'lesson' label
+  # the group name is just the label value
   - prefix: ""
     key: 'docker_config.Labels["lesson"]'
     separator: ""
 
-  - prefix: image
-    key: docker_config.Image
-
+  # create groups based on the containers `group` label
+  # not all will have this group, as only certain
+  # lessons will include this label
   - prefix: ""
     key: 'docker_config.Labels["group"]'
     separator: ""

@@ -1,3 +1,7 @@
 ---
+# see `inventory/docker.yml` for the `keyed_groups` section
+# this group vars is only for hosts with the primer-amazon
+# image
 
+# force Ansible to use python2 on these hosts
 ansible_python_interpreter: "/usr/bin/python"

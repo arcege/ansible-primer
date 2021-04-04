@@ -1,0 +1,61 @@
+---
+
+- name: Node pool
+  hosts: ~limit
+  serial:
+    - 1
+    - 33%
+    - 100%
+  vars:
+    - release: "2.9"
+  pre_tasks:
+    - name: Pre-install python-apt
+      become: yes
+      check_mode: false
+      package:
+        name: python3-apt
+
+  tasks:
+    - name: Install (mock) load-balancer tool
+      become: true
+      copy:
+        dest: "/usr/bin/lb"
+        content: |
+            #!/bin/sh
+            cmd=$1
+            # read servers from stdin
+            while read server; do
+                echo $cmd $server
+            done
+            exit 0
+        mode: a+x
+
+    - name: Install Ansible {{ release }}
+      ansible.builtin.pip:
+        name: ansible
+        version: "{{ release }}"
+
+    - name: Remove hosts from load-balancer
+      changed_when: false
+      ansible.builtin.command: lb remove -
+      args:
+        stdin: "{{ ansible_play_batch | join('\n') }}\n"
+      run_once: true
+
+    - name: Install nginx
+      import_role:
+        name: nginx-server
+
+    - name: Force handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Wait until ready
+      wait_for:
+        port: 80
+
+    - name: Remove hosts from load-balancer
+      changed_when: false
+      ansible.builtin.command: lb add -
+      args:
+        stdin: "{{ ansible_play_batch | join('\n') }}\n"
+      run_once: true

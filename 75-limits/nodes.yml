@@ -1,0 +1,27 @@
+---
+
+name: limits
+
+force_kill: true
+
+nodes:
+  - name: node0
+    image: primer-ubuntu
+  - name: node1
+    image: primer-ubuntu
+  - name: node2
+    image: primer-ubuntu
+  - name: node3
+    image: primer-ubuntu
+  - name: node4
+    image: primer-ubuntu
+  - name: node5
+    image: primer-ubuntu
+  - name: node6
+    image: primer-ubuntu
+  - name: node7
+    image: primer-ubuntu
+  - name: node8
+    image: primer-ubuntu
+  - name: node9
+    image: primer-ubuntu

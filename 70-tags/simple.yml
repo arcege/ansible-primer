@@ -1,0 +1,74 @@
+---
+
+- name: Using tags
+  hosts: localhost
+  gather_facts: false
+  # tags on the whole play
+  tags:
+    - sphere
+  tasks:
+    - name: Always run (sphere)
+      ansible.builtin.debug:
+        msg: Should always run
+      # tags on this task
+      tags:
+        - always  # special tag
+
+    - name: Never run (unless 'debug' or 'never') (sphere)
+      ansible.builtin.debug:
+        msg: Never seem me (unless you want me)
+      tags:
+        - debug
+        - never  # special tag
+
+    - name: I've got no tags on me? (sphere)
+      ansible.builtin.debug:
+        msg: "No tag?  I don't think so"
+
+    - name: A or B (sphere)
+      ansible.builtin.debug:
+        msg: With A or B in the tags
+      tags:
+        - A
+        - B
+
+    - name: B or C (sphere)
+      ansible.builtin.debug:
+        msg: With B or C
+      tags:
+        - B
+        - C
+
+    - name: A or D (sphere)
+      ansible.builtin.debug:
+        msg: With A or D
+      tags:
+        - A
+        - D
+
+- name: More tags
+  hosts: localhost
+  gather_facts: false
+  tags:
+    - cube
+  tasks:
+    - name: A or B (cubed)
+      ansible.builtin.debug:
+        msg: With A or B
+      tags:
+        - A
+        - B
+
+    - name: D (cubed)
+      ansible.builtin.debug:
+        msg: With D
+      tags:
+        - D
+
+- name: No tags
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: I've still got no tags on me (real)
+      ansible.builtin.debug:
+          msg: "No really, no tags on me"

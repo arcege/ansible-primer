@@ -1,0 +1,37 @@
+---
+# tasks file for mongo
+
+- name: Install mongodb
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: mongodb
+  notify:
+    - Restart mongodb
+  tags:
+    - install
+
+- debug:
+    msg: "Mongodb is installed"
+  tags:
+    - debug
+    - never
+
+- name: Configure mongodb
+  become: true
+  ansible.builtin.template:
+    src: mongod.conf.j2
+    dest: /etc/mongod.conf
+  notify:
+    - Restart mongodb
+  tags:
+    - config
+
+- name: Start mongodb
+  become: true
+  ansible.builtin.service:
+    name: mongodb
+    enabled: true
+    state: started
+  tags:
+    - always  # a special tag

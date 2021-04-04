@@ -1,2 +1,5 @@
+# All hosts will have these values in their hostvars
+
 blood: A+
+
 location: Earth

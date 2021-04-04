@@ -1,0 +1,33 @@
+---
+
+- name: Create journal directory
+  become: true
+  ansible.builtin.file:
+    state: directory
+    path: "/var/log/journal"
+  tags:
+    - install
+    - system
+
+# while this is read-only, the directories containing the
+# file may be inaccessible to the average user, hence the
+# become
+- name: Journal file
+  become: true
+  stat:
+    path: "/var/log/journal/nginx.service.log"
+  register: journal
+  tags:
+    - install
+    - system
+
+- name: Create journal file
+  become: true
+  when: journal.stat.exists
+  ansible.builtin.file:
+    state: touch
+    path: journal.stat.path
+    owner: nginx
+  tags:
+    - install
+    - system

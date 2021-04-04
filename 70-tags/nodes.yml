@@ -1,0 +1,7 @@
+---
+
+name: "tags"
+
+nodes:
+  - name: lamp
+    image: primer-ubuntu

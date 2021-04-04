@@ -1,3 +1,6 @@
+# trying to keep this pretty minimal
 ansible
 docker
+
+# for `mkdocs.sh`
 markdown

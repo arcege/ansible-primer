@@ -106,6 +106,7 @@
       failed_when: false
       community.docker.docker_container:
         state: "absent"
+        force_kill: "{{ old.force_kill | default(false) }}"
         name: "{{ item.altname | default(old.name + '-' + item.name) }}"
         container_default_behavior: compatibility
       loop: "{{ (old is defined) | ternary(old.nodes, []) }}"
@@ -165,15 +166,18 @@
         # merge node's 'labels' with standard labels
         labels: "{{ item.labels | default({}) | combine(local_labels) }}"
         stop_timeout: 100
+        entrypoint: "{{ item.entrypoint | default(omit) }}"
         mounts:
           - type: tmpfs
             target: /tmp
         privileged: true
         exposed_ports: "{{ this.nodes.ports | default(omit) }}"
+        container_default_behavior: no_defaults
       loop: "{{ this.nodes }}"
       vars:
           local_labels:
               app: ansible-primer
+              group: "{{ item.group | default(omit) }}"
               lesson: "{{ this.name }}"
               name: "{{ item.name }}"
       tags:

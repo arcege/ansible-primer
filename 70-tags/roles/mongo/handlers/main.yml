@@ -1,9 +1,8 @@
 ---
+# handlers file for mongo
 
-- name: Restart nginx server
+- name: Restart mongodb
   become: true
   ansible.builtin.service:
-    name: "nginx"
+    name: mongodb
     state: restarted
-  tags:
-    - config

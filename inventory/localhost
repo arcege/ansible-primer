@@ -1,1 +1,4 @@
+# this is an ini formatted inventory file
+
+# force the 'local' connection plugin and using python3 executable
 localhost ansible_host=127.0.0.1 ansible_connection=local ansible_python_interpreter=python3

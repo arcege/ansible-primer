@@ -1,41 +1,36 @@
 ---
 
-  # all in block become root
+# all in block become root
 - become: true
   block:
-    - name: Install packages
-      ansible.builtin.package:
-        name: nginx
-
     - name: Create user (if not present)
       ansible.builtin.user:
         name: nginx
+      tags:
+        - install
+        - user
+
+    - name: Install packages
+      ansible.builtin.package:
+        name: nginx
+      tags:
+        - install
+
+    - name: Journalling for nginx
+      when: ansible_os_family == "RedHat"
+      ansible.builtin.include_tasks: journal.yml
 
     - name: Enable nginx service
       ansible.builtin.service:
         name: nginx
         enabled: true
+      tags:
+        - install
 
     - name: Nginx config templates
       ansible.builtin.template:
         src: nginx.conf.j2
         dest: /etc/nginx/nginx.conf
       notify: Restart nginx server
-
-    - name: Create journal directory
-      when: ansible_os_family == "RedHat"
-      ansible.builtin.file:
-        state: directory
-        path: "/var/log/journal"
-
-    - name: Journal file
-      stat:
-        path: "/var/log/journal/nginx.service.log"
-      register: journal
-
-    - name: Create journal file
-      when: ansible_os_family == "RedHat" and not journal.stat.exists
-      ansible.builtin.file:
-        state: touch
-        path: journal.stat.path
-        owner: nginx
+      tags:
+        - config

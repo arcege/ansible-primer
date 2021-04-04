@@ -1,0 +1,33 @@
+---
+
+- name: Set up a LAMP system
+  hosts: limits
+  pre_tasks:
+    - name: Install python-apt
+      become: true
+      check_mode: false
+      ansible.builtin.command: apt-get install -y python3-apt
+      args:
+        warn: false
+      changed_when: "'already' not in py3apt.stdout"
+      register: py3apt
+
+  tasks:
+    - name: Install nginx
+      ansible.builtin.import_role:
+        name: nginx-server
+      tags:
+        - apache
+
+    - name: Install mongodb
+      ansible.builtin.include_role:
+        name: mongo
+      tags:
+        - mysql
+
+    - name: Install Python 3
+      become: true
+      ansible.builtin.package:
+        name: python3
+      tags:
+        - php

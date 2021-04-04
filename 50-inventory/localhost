@@ -1,1 +1,6 @@
+# this is an ini formatted inventory file
+# the localhost here is called 'here' to distinguish from the actual
+# system hostname 'localhost'
+
+# the Ansible hostname using the 'local' connection plugin
 here ansible_host=localhost ansible_connection=local

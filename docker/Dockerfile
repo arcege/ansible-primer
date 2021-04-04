@@ -1,4 +1,13 @@
 # Dockerfile for primer images
+# this isn't anything special
+# * expose some ports that may be used later
+# * install commands needed
+# * setup `docker-systemctl-replacement`
+# * create a 'docker' user for Ansible to use
+# * add the generated ssh-key to authorized_keys
+
+# the result is a docker container that runs a
+# mocked out systemd system
 
 ARG BASEIMAGE
 FROM ${BASEIMAGE}
