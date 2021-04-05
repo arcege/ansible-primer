@@ -1,4 +1,5 @@
 ---
+# show how facts acn be altered
 
 - name: Showing set_fact use
   hosts: variables
@@ -14,6 +15,7 @@
         quiet: true
 
   tasks:
+    # set a new 'fact' (variable) as a string
     - name: Set my blood type and location
       ansible.builtin.set_fact:
         my_blood_type: "{{ location }}/{{ blood }}"
@@ -22,6 +24,7 @@
       ansible.builtin.debug:
         var: my_blood_type
 
+    # run through a loop, appending the new value to the end of the fact
     - name: Iterative accumulation
       ansible.builtin.set_fact:
         sum: "{{ sum }},{{ item * item }}"

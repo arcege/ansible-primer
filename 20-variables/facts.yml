@@ -1,9 +1,16 @@
 ---
+# The purpose of this playbook is to show how and when facts are gathered
+# Run with either
+# `-e gather=true` to show some of the standrd host facts
+# `-e gather=false` to show the values when no facts are gathered
 
 - name: Requirement
+  # perform locally
   hosts: localhost
+  # we don't care about facts here
   gather_facts: false
   tasks:
+    # this just verifies that the `gather` extra var is defined on the command-line
     - name: Check gather variable
       ansible.builtin.assert:
         that:
@@ -15,8 +22,10 @@
 # do _not_ load facts for each host in the play
 - name: Facts? {{ gather }}
   hosts: all
+  # use the gather variable from --extra-vars
   gather_facts: "{{ gather }}"
   tasks:
+    # show the variable values for each host
     - name: CPU type
       ansible.builtin.debug:
         var: ansible_machine
@@ -30,6 +39,7 @@
         var: ansible_distribution
 
 
+# back on the local machine, show OS distribution for each host
 - name: Using hostvars facts
   hosts: localhost
   gather_facts: false

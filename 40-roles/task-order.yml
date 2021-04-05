@@ -1,0 +1,28 @@
+---
+# plays can have both 'roles' and 'tasks' blocks; each with different formats
+# but the order is that tasks block is executed _after_ the roles block
+
+- name: Order of roles vs tasks
+  hosts: webapp
+
+# just because I'm first in the file, doesn't mean I'm called first
+
+  tasks:
+    - name: when is this called
+      ansible.builtin.debug:
+        msg: "Am I first?"
+
+  roles:
+    - name: hello_world
+
+
+- name: Order of roles in tasks
+  hosts: database
+
+  tasks:
+    - name: when is this called
+      ansible.builtin.debug:
+        msg: "Am I first?"
+
+    - ansible.builtin.import_role:
+        name: hello_world

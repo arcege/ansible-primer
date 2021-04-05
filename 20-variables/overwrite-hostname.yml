@@ -1,4 +1,6 @@
 ---
+# this shows what can happen when you attempt to change one
+# of Ansible standard variables
 
 - name: Overwritting Ansible predefined variables
   hosts: variables
@@ -7,6 +9,8 @@
     - name: This will succeed
       ansible.builtin.command: "true"
 
+    # this is not the `inventory_hostname` the user sees
+    # but the hostname Ansible uses to connect
     - name: Overwrite the host name
       ansible.builtin.set_fact:
         ansible_host: "{{ blood }}"

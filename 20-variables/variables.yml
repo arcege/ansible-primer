@@ -1,5 +1,13 @@
 ---
+# show the complex interactions of variables
+# from various sources
+# play variables
+# vars file
+# host vars files
+# group vars files
 
+
+# show a variable installed in a play
 - name: Play variables
   hosts: 20-variables-centos
   gather_facts: false
@@ -11,6 +19,7 @@
         var: app
 
 
+# show a variable from a vars file in the play
 - name: Play varsfiles
   hosts: 20-variables-amazon
   gather_facts: false
@@ -22,6 +31,8 @@
       debug:
         var: app
 
+# show a variable from a vars file included
+# as a task
 - name: Play include_vars
   hosts: 20-variables-ubuntu
   gather_facts: false
@@ -33,6 +44,8 @@
       debug:
         var: app
 
+# show a variable on the first vars file
+# found based on the hosts facts
 - name: First come
   hosts: variables
   gather_facts: true
@@ -47,6 +60,8 @@
       debug:
         var: meal
 
+# show a variable from a host_vars file based
+# on the inventory host
 - name: Host vars
   hosts: variables
   gather_facts: false
@@ -55,6 +70,8 @@
       debug:
         var: location
 
+# show a variable from a group vars file
+# based on the inventory group
 - name: Group vars
   hosts: all
   gather_facts: false

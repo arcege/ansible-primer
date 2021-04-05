@@ -73,8 +73,11 @@ The task with the 'never' tag will not be run by default.
 Especially if multiple tags are attached to the object, then skipping
 and including tags can help tailor the flow more appropriately.
 
-    ansible-playbook 70-tags/simple.py --tags A --skip-tags D
+    ansible-playbook 70-tags/simple.yml --tags A --skip-tags D
 
+Now imagine software for a LAMP service needs to be the http server updated, but not the config files.
+
+    ansible-playbook 70-tags/lamp.yml --tags apache --skip-tags config,system
 
 ## Importing vs Including
 

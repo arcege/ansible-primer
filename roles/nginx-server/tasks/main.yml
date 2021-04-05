@@ -18,7 +18,7 @@
 
     - name: Journalling for nginx
       when: ansible_os_family == "RedHat"
-      ansible.builtin.include_tasks: journal.yml
+      ansible.builtin.import_tasks: journal.yml
 
     - name: Enable nginx service
       ansible.builtin.service:

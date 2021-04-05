@@ -1,0 +1,6 @@
+---
+# tasks file for hello_world
+
+- name: Hi there
+  debug:
+    msg: "{{ msg | default('Hello, World') }}"

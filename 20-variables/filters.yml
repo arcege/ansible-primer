@@ -1,11 +1,16 @@
 ---
+# This shows how to use filters in Jinja2 template strings
+# Not all Jinja2 templates are available and Ansible adds its
+# own set.
 
 - name: Filters
   hosts: variables
   vars:
+    # a dict
     structure:
       field_a: value_a
       field_b: value_b
+    # a list
     seq:
       - 0
       - 1
@@ -23,14 +28,24 @@
       debug:
         msg: "raw: {{ structure }}; json: {{ structure | to_json }}"
 
-    - name: Comma separated
+    - name: Comma separated list as string
       debug:
         msg: "{{ seq | join(',') }}"
 
     - name: First in the list
-      debug: "{{ seq | first }}"
+      debug:
+        msg: "{{ seq | first }}"
 
 
+# the next two show how filtering can affect the remote side
+# simple and silly, but still a good demonstration
+# each attempts to list the files created above using the
+# command `ls {files}`
+# In the unquoted, expect to see the three files without spaces
+# In the quoted, expect to see one file with spaces
+- name: Quoting
+  hosts: variables
+  tasks:
     - name: Create four files, one with spaces
       file:
         path: "{{ item }}"
@@ -43,18 +58,18 @@
 
     - name: Shell unquoted
       diff: true
-      ansible.builtin.shell: "ls {{ filename }}"
+      ansible.builtin.command: "ls {{ filename }}"
       vars:
         filename: "file with spaces"
       register: unquoted
     - debug:
-        var: unquoted
+        var: unquoted.stdout_lines
 
     - name: Shell quoted
       diff: true
-      ansible.builtin.shell: "ls {{ filename | quote }}"
+      ansible.builtin.command: "ls {{ filename | quote }}"
       vars:
         filename: "file with spaces"
       register: quoted
     - debug:
-        var: quoted
+        var: quoted.stdout_lines

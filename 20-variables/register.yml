@@ -1,4 +1,5 @@
 ---
+# What gets output from a task and how to possibly use it
 
 - name: Register variables
   hosts: localhost
@@ -7,26 +8,37 @@
 
     - command: whoami
       register: who
-    - debug:
-        var=who.stdout
+    # notice the values returned
     - debug:
         var=who
+    # isolate just the stdout value
+    - debug:
+        var=who.stdout
 
+    # should be undefined
     - debug:
         var: file1
     - stat:
         path: nosuchfile
       register: file1
-
+    # is now defined from the register
     - debug:
         var: file1.stat
 
+    # show just the stats structure
+    # notice that the `when` value is not
+    # within Jinja2 delimiters, but is a
+    # value Jinja2 expression
     - stat:
         path: nodes.yml
       register: file2
     - debug:
         var: file2.stat
+      when: file2.stat.exists
 
+    # loop through a set of files
+    # this creates a 'results' list in the register value
+    # which can then be used
     - stat:
         path: "{{ item }}"
       loop:
@@ -35,8 +47,13 @@
         - register.yml
         - variables.yml
       register: files3
+    # show the register
     - debug:
         var: files3
+    # iterate over the results, only showing the msgs for
+    # files that do not exist
+    # as this is also in a list and the result has an `item`,
+    # to get to the original loop item
     - debug:
         msg: "{{ item.item }} does not exist"
       when: not item.stat.exists

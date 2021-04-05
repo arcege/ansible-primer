@@ -85,3 +85,14 @@ from the `templates/` directory and uploads it to the host(s) with interpolation
 Similar to the `template` module, the `copy` module uses files in the `files/` directory, copying them to the host.  Data is not interpolated.
 
 Other modules will use files here as well, such as `unarchive` and `patch`.
+
+## Roles vs tasks
+
+The example playbook, `playbook.yml` shows two plays, one using a role under `roles`, and another with an `import_role` task.  Both call the role in the same way and if the play is simple, then either is
+fine.
+
+Except mixing `roles` and `tasks` must be managed more carefully.  Tasks under `tasks` are always run after all the roles in `roles`.  As the next example illustrates:
+
+    ansible-playbook 40-roles/task-order.yml
+
+While `tasks` is before `roles` in the first play, the tasks are executed after.  The second play allows for a proper mix of task and role execution by only using `tasks` with `import_role`.
