@@ -1,7 +1,7 @@
 ---
 # external variables:
 # operation - what to perform (see below)
-# lesson - where the 'nodes.yml' file should be found
+# lesson - where the '_primer_nodes.yml' file should be found
 #     this is cached in the `.current` file at the top directory
 #
 #  operation is one of the following:
@@ -48,16 +48,16 @@
         src: "{{ current_file }}"
       register: current_lesson_file
       tags:
-        - setup
-        - no-cache
+        - always
+        - state
 
     - name: Current lesson
       when: current_lesson_file is defined and current_lesson_file.content is defined
       set_fact:
         current: "{{ current_lesson_file.content | b64decode | trim }}"
       tags:
-        - setup
-        - no-cache
+        - always
+        - state
 
     - name: Check for a lesson
       when: current == "" and lesson is not defined
@@ -69,26 +69,33 @@
       set_fact:
         lesson: "{{ current }}"
       tags:
-        - setup
+        - always
 
     - name: This lesson
       debug:
         msg: "The lesson setup is {{ lesson }}"
 
+    - name: Is there a provisioning playbook
+      stat:
+        path: "{{ lesson }}/_primer_provisioning.yml"
+      register: provisioning
+      tags:
+        - vms
+
     - name: Load new lesson nodes
       include_vars:
-        file: "{{ playbook_dir }}/{{ lesson }}/nodes.yml"
+        file: "{{ playbook_dir }}/{{ lesson }}/_primer_nodes.yml"
         name: this
       tags:
-        - setup
+        - always
 
     - name: Load current lesson nodes
       when: current != ""
       include_vars:
-        file: "{{ playbook_dir }}/{{ current }}/nodes.yml"
+        file: "{{ playbook_dir }}/{{ current }}/_primer_nodes.yml"
         name: old
       tags:
-        - setup
+        - always
 
     - name: Generate SSH key
       community.crypto.openssh_keypair:
@@ -99,7 +106,7 @@
         type: "rsa"
       register: sshkey
       tags:
-        - setup
+        - vms
 
     - name: Stop the containers
       when: operation in (to_stop + to_remove) or current != lesson or sshkey is changed
@@ -114,7 +121,7 @@
         - vms
 
     - name: Remove the images
-      when: operation in to_remove or sshkey is changed
+      when: operation in to_remove or (sshkey is defined and sshkey is changed)
       community.docker.docker_image:
         state: absent
         source: local
@@ -174,12 +181,24 @@
         exposed_ports: "{{ this.nodes.ports | default(omit) }}"
         container_default_behavior: no_defaults
       loop: "{{ this.nodes }}"
+      register: vms
       vars:
           local_labels:
               app: ansible-primer
               group: "{{ item.group | default(omit) }}"
               lesson: "{{ this.name }}"
               name: "{{ item.name }}"
+      tags:
+        - vms
+
+    - name: New hosts
+      no_log: true
+      when: item.invocation is defined
+      ansible.builtin.add_host:
+        name: "{{ item.invocation.module_args.name }}"
+        groups: newhosts
+        ansible_connection: docker
+      loop: "{{ vms.results }}"
       tags:
         - vms
 
@@ -196,4 +215,15 @@
       file:
         state: absent
         path: "{{ current_file }}"
+      tags:
+        - state
 
+- name: Post-creation provisioning
+  hosts: newhosts
+  tasks:
+    - name: Per-lesson provision
+      when: hostvars.localhost.provisioning.stat.exists
+      ansible.builtin.include_tasks:
+        file: "{{ hostvars.localhost.provisioning.stat.path }}"
+      tags:
+        - vms

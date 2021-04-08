@@ -1,0 +1,37 @@
+---
+
+- name: Enable ssh (!svr5)
+  when: "'debugging' in groups and inventory_hostname != 'debugging-svr5'"
+  become: true
+  service:
+    name: sshd
+    enabled: true
+    state: started
+
+- name: Add alt user for SSH (svr4)
+  when: "'debugging' in groups and inventory_hostname == 'debugging-svr4'"
+  become: true
+  block:
+    - name: Ansible user
+      ansible.builtin.user:
+        name: ansible
+        group: sudo
+        create_home: true
+
+    - name: Add SSH key
+      ansible.posix.authorized_key:
+        state: present
+        user: ansible
+        key: "{{ lookup('file', 'docker/ssh-key.pub') }}"
+
+    - name: Remove original key
+      ansible.builtin.file:
+        state: absent
+        path: "~docker/.ssh/authorized_keys"
+
+- name: Remove python (svr3)
+  when: "'debugging' in groups and inventory_hostname == 'debugging-svr3'"
+  become: true
+  package:
+    state: absent
+    name: python3-minimal

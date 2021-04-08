@@ -20,6 +20,7 @@ commands.
 * `60-idempotence` - desired state as opposed to functional ends
 * `70-tags` - limit tasks to be executed
 * `75-limits` - limit hosts to be executed against
+* `80-debugging` - how to handle issues
 
 Each lesson has its own environment, see `Environment` below, to orchestrate and
 provision hosts for that lesson to perform against.
