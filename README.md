@@ -79,7 +79,7 @@ be specified on the command-line.
 
 ## Documentation
 
-The overall documentation is the README files, but the `mkdocs.sh` program
+The overall documentation is the README files, but the `setup/mkdocs.sh` program
 will convert them to HTML in the `docs` directory.
 
 ## Failures
@@ -93,7 +93,5 @@ apologies.
 The following files can be ignored for the lessons, they are for the environment to
 use.
 
-* `docker/`
-* `requirements.sh`
-* `mkdocs.sh`
+* `setup/`
 * `LICENSE`

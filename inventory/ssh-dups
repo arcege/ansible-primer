@@ -13,8 +13,8 @@ Using standard dynamic inventory interface:
 * `--list` - show group structure, with '_meta' host vars
 * `--host` - show host variables
 
-The SSH private key is in `docker/ssh-key`.  The public key is
-installed via `docker/Dockerfile` to ~docker/.ssh/authorized_keys`.
+The SSH private key is in `setup/ssh-key`.  The public key is
+installed via `setup/Dockerfile` to ~docker/.ssh/authorized_keys`.
 """
 
 import json
@@ -32,14 +32,17 @@ def inspect():
     cont_out = subprocess.check_output(
         ('docker', 'ps', '-q'),
     )
-    containers = tuple(cont_out.decode('utf-8').rstrip().split('\n'))
-    inspected = subprocess.check_output(
-        ('docker', 'inspect') + containers
-    )
-    return dict(
-        (normalize_hostname(host['Name']), ssh_host(host))
-        for host in json.loads(inspected)
-    )
+    result = cont_out.decode('utf-8').rstrip()
+    if result:
+        containers = tuple(result.split('\n'))
+        inspected = subprocess.check_output(
+            ('docker', 'inspect') + containers
+        )
+        return dict(
+            (normalize_hostname(host['Name']), ssh_host(host))
+            for host in json.loads(inspected)
+        )
+    return {}
 
 
 def ssh_host(host):

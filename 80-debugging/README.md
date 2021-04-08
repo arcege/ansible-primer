@@ -109,8 +109,8 @@ module against that server or group.
 From there, you can determine the connection string with `-vvv` for a specific host.
 
     ansible -vvv s-debugging-svr5  -m ping
-    ssh -vv -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o docker/ssh-key docker@172.17.0.2 uptime  # one of the suceessful hosts
-    ssh -vv -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i docker/ssh-key docker@172.17.0.6 uptime  # use the IP from the ping command
+    ssh -vv -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o setup/ssh-key docker@172.17.0.2 uptime  # one of the suceessful hosts
+    ssh -vv -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i setup/ssh-key docker@172.17.0.6 uptime  # use the IP from the ping command
 
 There may be situations where the connection string may be different between
 `ansible` and `ansible-playbook`, but adhoc ping is a good starting place.
@@ -143,5 +143,5 @@ However, on a system where Python is not installed, this could lead to problems.
 From an earlier less, the `raw` module does _not_ use Python to execute the commands.  This allows Ansible to install Python - without Python.
 
     ansible s-debugging-svr3 -m raw -a 'sudo apt-get install -y python3-minimal'
-    ansible s-debugging-svr4 -m ping
+    ansible s-debugging-svr3 -m ping
 

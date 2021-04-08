@@ -17,7 +17,7 @@
   gather_facts: false
   vars:
     current_file: "{{ playbook_dir }}/.current"
-    ssh_keyfile: "docker/ssh-key"
+    ssh_keyfile: "setup/ssh-key"
     images:
       - name: primer-ubuntu
         image: ubuntu:focal
@@ -158,7 +158,7 @@
             source: build
             force_source: "{{ operation in to_build }}"
             build:
-              path: "docker"
+              path: "setup"
               args:
                 BASEIMAGE: "{{ item.image }}"
           loop: "{{ images }}"

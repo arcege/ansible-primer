@@ -12,8 +12,8 @@ Using standard dynamic inventory interface:
 * `--list` - show group structure, with '_meta' host vars
 * `--host` - show host variables
 
-The SSH private key is in `docker/ssh-key`.  The public key is
-installed via `docker/Dockerfile` to ~docker/.ssh/authorized_keys`.
+The SSH private key is in `setup/ssh-key`.  The public key is
+installed via `setup/Dockerfile` to ~docker/.ssh/authorized_keys`.
 """
 
 import json
@@ -51,7 +51,7 @@ def add_ssh_config(host):
     host['ansible_host'] = host['NetworkSettings']['IPAddress']
     host['ansible_ssh_user'] = 'docker'
     host['ansible_ssh_port'] = '22'
-    host['ansible_ssh_private_key_file'] = 'docker/ssh-key'
+    host['ansible_ssh_private_key_file'] = 'setup/ssh-key'
     host['ansible_ssh_common_args'] = '-o IdentitiesOnly=yes'
 
 
