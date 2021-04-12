@@ -24,7 +24,7 @@ finish_lesson () {
 }
 
 call_adhoc () {
-    echo "-- adhoc $@ --"
+    echo "-- adhoc $* --"
     ansible "$@"
     if [ $? -ne 0 ]; then
         echo "ERROR: adhoc $*" >&2
@@ -34,7 +34,7 @@ call_adhoc () {
 }
 
 fail_adhoc () {
-    echo "-- adhoc $@ --"
+    echo "-- adhoc $* --"
     ansible "$@"
     if [ $? -eq 0 ]; then
         echo "ERROR: adhoc $*" >&2
@@ -44,7 +44,7 @@ fail_adhoc () {
 }
 
 call_playbook () {
-    echo "-- playbook $@ --"
+    echo "-- playbook $* --"
     ansible-playbook ${1:+"$@"}
     if [ $? -ne 0 ]; then
         echo "ERROR: playbook ${1}" >&2
@@ -54,7 +54,7 @@ call_playbook () {
 }
 
 fail_playbook () {
-    echo "-- playbook $@ --"
+    echo "-- playbook $* --"
     ansible-playbook ${1:+"$@"}
     if [ $? -eq 0 ]; then
         echo "ERROR: expected eorr: ${1}" >&2
@@ -93,7 +93,7 @@ call_lesson_variables () {
 call_lesson_adhoc () {
     set_lesson 30-adhoc
 
-    call_adhoc all -m ansible.builtin.ping
+    call_adhoc adhoc -m ansible.builtin.ping
 
     call_adhoc adhoc -m ansible.builtin.setup
 
@@ -121,23 +121,23 @@ call_lesson_roles () {
 call_lesson_inventory () {
     set_lesson 50-inventory
 
-    call_adhoc -i 50-inventory/script.py all -m debug -a var=inventory_hostname
+    call_adhoc -i 50-inventory/script.py app,group_dns -m debug -a var=inventory_hostname
 
-    call_adhoc -i 50-inventory/script.py all -m debug -a var=ansible_host
+    call_adhoc -i 50-inventory/script.py app,group_dns -m debug -a var=ansible_host
 
-    call_adhoc -i 50-inventory/static.yml all --list-hosts
-    call_adhoc -i 50-inventory/static.ini all --list-hosts
-    call_adhoc -i 50-inventory/docker.yml all --list-hosts
-    call_adhoc -i 50-inventory/script.py all --list-hosts
-    call_adhoc -i 50-inventory/localhost all --list-hosts
+    call_adhoc -i 50-inventory/static.yml app,group_dns --list-hosts
+    call_adhoc -i 50-inventory/static.ini app,group_dns --list-hosts
+    call_adhoc -i 50-inventory/docker.yml app,group_dns --list-hosts
+    call_adhoc -i 50-inventory/script.py app,group_dns --list-hosts
+    call_adhoc -i 50-inventory/localhost app,group_dns --list-hosts
     call_adhoc -i 50-inventory/docker.yml group_webapp:dns01 --list-hosts
     call_adhoc -i 50-inventory/static.yml 'all:!group_database' --list-hosts
 
     call_adhoc -i 50-inventory/static.yml group_webapp -m debug -a var=install_dir
 
-    fail_adhoc -i 50-inventory/script.py all -a id
-    call_adhoc -i 50-inventory/docker.yml all -b -m service -a 'name=sshd state=started'
-    call_adhoc -i 50-inventory/script.py all -a id
+    fail_adhoc -i 50-inventory/script.py app,group_dns -a id
+    call_adhoc -i 50-inventory/docker.yml app,group_dns -b -m service -a 'name=sshd state=started'
+    call_adhoc -i 50-inventory/script.py app,group_dns -a id
 }
 
 call_lesson_debugging () {
@@ -163,6 +163,7 @@ call_lesson_playbooks
 call_lesson_variables
 call_lesson_adhoc
 call_lesson_roles
-call_lesson_inventory call_lesson_debugging
+call_lesson_inventory
+call_lesson_debugging
 
 finish_lesson

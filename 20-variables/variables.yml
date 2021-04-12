@@ -73,7 +73,7 @@
 # show a variable from a group vars file
 # based on the inventory group
 - name: Group vars
-  hosts: all
+  hosts: variables
   gather_facts: false
   tasks:
     - name: Where
