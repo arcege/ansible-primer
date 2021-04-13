@@ -12,7 +12,7 @@ Each lesson will have a `README.md` file that walks the user through the steps.
 Some steps may be manual to show the difficulty, but most will be running Ansible
 commands.
 
-* `10-playbooks` - learn the basic structure and flow of playbooks, plays and tasks
+* [playbooks](10-playbooks/README.md) - learn the basic structure and flow of playbooks, plays and tasks
 * `20-variables` - learn about variables, facts and registers
 * `30-adhoc` - use ad-hoc commands to execute on a range of hosts
 * `40-roles` - modularized execution
