@@ -4,3 +4,7 @@ docker
 
 # for `mkdocs.sh`
 markdown
+molecule
+molecule-docker
+pytest
+pytest-testinfra

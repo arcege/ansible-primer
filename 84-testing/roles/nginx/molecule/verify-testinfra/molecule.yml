@@ -1,0 +1,18 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: centos
+    image: centos:8
+    groups:
+      - inventory
+  - name: ubuntu
+    image: ubuntu:focal
+    groups:
+      - inventory
+provisioner:
+  name: ansible
+verifier:
+  name: testinfra

@@ -63,6 +63,32 @@ fail_playbook () {
     echo ""
 }
 
+call_molecule () {
+    echo "-- molecule $* --"
+    (
+        cd $1; shift
+        molecule "$@"
+    )
+    if [ $? -ne 0 ]; then
+        echo "$ERROR: molecule: ($1) $*" >&2
+        exit 1
+    fi
+    echo ""
+}
+
+fail_molecule () {
+    echo "-- molecule $* --"
+    (
+        cd $!; shift
+        molecule "$@"
+    )
+    if [ $? -eq 0 ]; then
+        echo "$ERROR: expected error: ($1) $*" >&2
+        exit 1
+    fi
+    echo ""
+}
+
 call_lesson_playbooks () {
     set_lesson 10-playbooks
 
@@ -140,6 +166,14 @@ call_lesson_inventory () {
     call_adhoc -i 50-inventory/script.py app,group_dns -a id
 }
 
+call_lesson_testing () {
+    set_lesson 84-testing
+    call_molecule 84-testing/roles/minimal test
+
+    call_molecule 84-testing/roles/nginx test -s verify-ansible
+    call_molecule 84-testing/roles/nginx test -s verify-testinfra
+}
+
 call_lesson_debugging () {
     rm -f inventory/host_vars/s-debugging-svr4.yml
     set_lesson 80-debugging
@@ -165,5 +199,6 @@ call_lesson_adhoc
 call_lesson_roles
 call_lesson_inventory
 call_lesson_debugging
+call_lesson_testing
 
 finish_lesson

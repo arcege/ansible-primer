@@ -1,0 +1,22 @@
+---
+dependency:
+  enabled: false
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: docker.io/pycontribs/centos:8
+    pre_build_image: true
+provisioner:
+  name: ansible
+scenario:
+  converge_sequence:
+    - create
+    - converge
+  destroy_sequence:
+    - destroy
+  test_sequence:
+    - destroy
+    - create
+    - converge
+    - destroy

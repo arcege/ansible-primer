@@ -21,6 +21,7 @@ commands.
 * `70-tags` - limit tasks to be executed
 * `75-limits` - limit hosts to be executed against
 * `80-debugging` - how to handle issues
+* `84-testing` - unit and functional testing
 
 Each lesson has its own environment, see `Environment` below, to orchestrate and
 provision hosts for that lesson to perform against.
