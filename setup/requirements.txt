@@ -2,8 +2,8 @@
 ansible
 docker
 
-# for `mkdocs.sh`
-markdown
+mkdocs
+wheel
 molecule
 molecule-docker
 pytest

@@ -1,11 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-mkdir -p docs
-python -m markdown < README.md > docs/index.html
+cmd=$1
+shift
 
-for mdfile in [0-9]*-*/README.md; do
-    name=$(dirname "${mdfile}")
-    python -m markdown < "${mdfile}" > "docs/${name}.html"
-done
-
-echo "Open browser to file://$PWD/docs"
+mkdocs "${cmd}" --config-file setup/mkdocs.yml "$@"

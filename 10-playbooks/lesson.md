@@ -25,10 +25,11 @@ They can be called multiple times with different imputs.
 _Variables_ are storage locations for data.  There are two types of
 variables, global and host specific.
 
-# Lesson
-
-There is little point to the `plays.yml` playbook as a whole, except to show
+---
+Author's note: There is little point to the playbooks as a whole, except to show
 various parts of the playbook and how they work together.
+
+---
 
 ### Names
 
@@ -37,6 +38,8 @@ for human consumption.  It can be any string with any content.  It can also incl
 (templated) variables.  The name can help more correctly identify the task being
 performed, especially when there are multiple in succession.  Otherwise tasks are
 
+The `notify` task attribute must match the name of a handler.  This is the only
+time the `name` attribute is required.
 
 ### Hosts
 

@@ -22,14 +22,18 @@ if [ -z "${VIRTUAL_ENV}" -o ! -d "${VIRTUAL_ENV}" ]; then
     source "${PRIMER_SRCDIR}/.venv/bin/activate"
 fi
 
+echo "Installing requirements"
 if ! PRIMER_PIPOUT=$(pip3 install -r "${PRIMER_SRCDIR}/setup/requirements.txt"); then
     echo "Error installing pip ${PRIMER_SRCDIR}/setup/requirements.txt"
     echo "${PRIMER_PIPOUT}"
 fi
 
+echo "Pulling galaxy requirements"
 if ! PRIMER_GXYOUT=$(ansible-galaxy install -r "${PRIMER_SRCDIR}/setup/galaxy.yml"); then
     echo "Error installing galaxy ${PRIMER_SRCDIR}/setup/galaxy.yml"
     echo "${PRIMER_GXYOUT}"
 fi
+
+echo "Run \`setup/mkdocs.sh serve\` for local lesson documentation"
 
 unset PRIMER_PIPOUT PRIMER_GXYOUT PRIMER_PROG PRIMER_SRCDIR
