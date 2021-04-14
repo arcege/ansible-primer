@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+# pylint: disable=invalid-name
+"""Dynamic inventory from docker with ssh connection plugin.
+
+Inspect the running docker containers, creating an inventory
+from that.
+
+* A group are created from the container 'group' label (`add_list_metadata`)
+* A ssh connection values (`add_ssh_config`)
+* Normalized Docker inventory 'variables' (`normalize_docker_structure`)
+
+Using standard dynamic inventory interface:
+* `--list` - show group structure, with '_meta' host vars
+* `--host` - show host variables
+
+The SSH private key is in `setup/ssh-key`.  The public key is
+installed via `setup/Dockerfile` to ~docker/.ssh/authorized_keys`.
+"""
+
+import json
+import subprocess
+import sys
+
+
+def normalize_hostname(host):
+    """Return without leading slash."""
+    return 's-' + host.lstrip('/')
+
+
+def inspect():
+    """Return the docker inspect json as a list."""
+    cont_out = subprocess.check_output(
+        ('docker', 'ps', '-q'),
+    )
+    result = cont_out.decode('utf-8').rstrip()
+    if result:
+        containers = tuple(result.split('\n'))
+        inspected = subprocess.check_output(
+            ('docker', 'inspect') + containers
+        )
+        return dict(
+            (normalize_hostname(host['Name']), ssh_host(host))
+            for host in json.loads(inspected)
+        )
+    return {}
+
+
+def ssh_host(host):
+    """Return a dict that would be the host info returned."""
+    return {
+        'ansible_host': host['NetworkSettings']['IPAddress'],
+        'labels': host['Config']['Labels'],
+    }
+
+
+def build_list(inventory, hostlist):
+    """Update the inventory with groups and hosts in the groups."""
+    for host in hostlist:
+        for groupname in determine_groups(hostlist[host]):
+            group = inventory.get(groupname, {'hosts': []})
+            group['hosts'].append(host)
+            group['hosts'].sort()
+            inventory[groupname] = group
+
+
+def determine_groups(host):
+    """Return a list of the group names that the host should be a member of."""
+    groups = []
+    labels = host['labels']
+    for label in labels:
+        if label == 'group':
+            groups.append('group_ssh_{}'.format(labels[label]))
+    return groups
+
+def main():
+    """The main routine."""
+    hosts = inspect()
+    if sys.argv[1] == '--list':
+        inventory = {}
+        build_list(inventory, hosts)
+    elif sys.argv[1] == '--host':
+        inventory = hosts[sys.argv[2]]
+    json.dump(inventory, sys.stdout)
+    sys.stdout.write('\n')
+
+
+if __name__ == '__main__':
+    main()

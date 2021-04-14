@@ -70,7 +70,7 @@ Examples:
     ansible adhoc -b -m service -a 'enabled=true name=redis-server'
 
 
-# Common ad-hoc only modules
+## Common ad-hoc only modules
 
 As mentioned above, some modules are only useful when run from the command-line.
 

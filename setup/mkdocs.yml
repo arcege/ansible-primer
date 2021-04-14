@@ -1,0 +1,18 @@
+site_name: Ansible Primer
+docs_dir: ..
+theme: readthedocs
+
+nav:
+  - Home: 'README.md'
+  - Playbooks: '10-playbooks/lesson.md'
+  - Variables: '20-variables/lesson.md'
+  - Adhoc: '30-adhoc/lesson.md'
+  - Roles: '40-roles/lesson.md'
+  - Inventory: '50-inventory/lesson.md'
+  - Idempotence: '60-idempotence/lesson.md'
+  - Limiting:
+      - 'Limit by Tags': '70-tags/lesson.md'
+      - 'Limit by Host': '75-limits/lesson.md'
+  - Development:
+    - Debugging: '80-debugging/lesson.md'
+    - Testing: '84-testing/lesson.md'

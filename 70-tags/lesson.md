@@ -87,7 +87,7 @@ the `import_*` and `include_*` classes of modules.
 At the surface, the two do the same thing: access the contents of
 other files as code.
 
-The difference between the two is _when_ the processing of the file occurs.  Importing a file occurs when it encounters the file.  Importing is at the time Ansible loads the playbook, roles, tasks and starts to process inventory, tags, etc.
+The difference between the two is _when_ the processing of the file occurs.  Including a file occurs when it encounters the play/role.  Importing is at the time Ansible loads the playbook, roles, tasks and starts to process inventory, tags, etc.
 
 As mentioned earlier, the set of tags are determined when Ansible first starts, before executing any tasks.  As imported files are loaded at that time, the tags inside the imported file are available.  Included files are loaded in the middle of execution, long after the list of tags is built.
 

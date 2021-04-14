@@ -1,0 +1,23 @@
+---
+
+name: debugging
+
+nodes:
+  - name: svr1
+    image: primer-ubuntu
+    group: svrs
+  - name: svr2
+    image: primer-ubuntu
+    group: svrs
+  - name: svr3
+    image: primer-ubuntu
+    group: svrs
+  - name: svr4
+    image: primer-ubuntu
+    group: svrs
+  - name: svr5
+    image: primer-ubuntu
+    group: svrs
+  - name: svr6
+    image: primer-ubuntu
+    group: svrs

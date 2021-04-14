@@ -1,0 +1,38 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+
+# potentially changing the state post-provisioning, which should be a
+# no-no in testing
+  - name: nginx package
+    become: true
+    ignore_errors: true
+    diff: true
+    package:
+      state: present
+      name: nginx
+    register: nginx_package
+  
+  - name: nginx service
+    become: true
+    ignore_errors: true
+    service:
+      state: started
+      name: nginx
+      enabled: true
+    register: nginx_service
+
+# while webservers will have nginx and other hosts will not
+# as the states above are based on if the host is in the appropriate group
+# the tests below should be correct either way: no change and no failure
+  - name: Check nginx
+    ansible.builtin.assert:
+      that:
+        - nginx_package.changed is false
+        - nginx_package.failed is false
+        - nginx_service.changed is false
+        - nginx_service.failed is false

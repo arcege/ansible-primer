@@ -1,0 +1,10 @@
+# trying to keep this pretty minimal
+ansible
+docker
+
+mkdocs
+wheel
+molecule
+molecule-docker
+pytest
+pytest-testinfra

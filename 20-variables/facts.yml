@@ -21,7 +21,7 @@
 
 # do _not_ load facts for each host in the play
 - name: Facts? {{ gather }}
-  hosts: all
+  hosts: variables:localhost
   # use the gather variable from --extra-vars
   gather_facts: "{{ gather }}"
   tasks:

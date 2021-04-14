@@ -2,7 +2,7 @@
 # multiple plays
 
 - name: Lesson 1 - plays - install nginx
-  hosts: all:!localhost
+  hosts: playbooks
   tasks:
     - name: Install nginx
       become: true
