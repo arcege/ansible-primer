@@ -6,7 +6,7 @@ Ansible work.  Playbooks give the what, which, when and where.
 _Playbooks_ are YAML files that contain plays, plays then contain tasks
 or roles.
 
-_Hosts_ and _Hostgroups_ are Ansible perorms the plays, tasks and roles against.
+_Hosts_ and _Hostgroups_ are what Ansible performs the plays, tasks and roles against.
 Hostnames are arbitrary in the _inventory_, but keeping them different from the
 real hostname can lead to confusion.  Groups allow for not just organizing the
 plays, but also setting variables - one group may use port 8888 while another uses
