@@ -24,7 +24,7 @@
       - name: primer-amazon
         image: amazonlinux:2
       - name: primer-centos
-        image: centos:8
+        image: dokken/centos-stream-8
     operation: start
     to_start:
       - start
