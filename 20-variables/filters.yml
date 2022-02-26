@@ -24,7 +24,7 @@
       debug:
         msg: "{{ ansible_os_family }} as lowercase {{ ansible_os_family | lower }}"
 
-    - debug: Output as json
+    - name: Output as json
       debug:
         msg: "raw: {{ structure }}; json: {{ structure | to_json }}"
 

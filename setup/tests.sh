@@ -1,5 +1,16 @@
 #/bin/bash
 
+build_images () {
+    echo "== Building test images =="
+    output=$(ansible-playbook operator.yml --tags images 2>&1)
+    if [ $? -ne 0 ]; then
+        echo "ERROR: building test images" >&2
+        echo "$output" >&2
+        exit 1
+    fi
+    echo ""
+}
+
 set_lesson () {
     echo "== $1 =="
     echo
@@ -193,6 +204,7 @@ call_lesson_debugging () {
 
 PRIMER_PROG=init.sh . init.sh
 
+build_images
 call_lesson_playbooks
 call_lesson_variables
 call_lesson_adhoc
