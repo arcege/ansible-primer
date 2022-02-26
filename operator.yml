@@ -16,8 +16,12 @@
   connection: local
   gather_facts: false
   vars:
+    # our 'state' file
     current_file: "{{ playbook_dir }}/.current"
+    # generated key location
     ssh_keyfile: "setup/ssh-key"
+    # we'll be reusing the same images
+    # the base images are standard from Docker Hub
     images:
       - name: primer-ubuntu
         image: ubuntu:focal
@@ -25,7 +29,9 @@
         image: amazonlinux:2
       - name: primer-centos
         image: dokken/centos-stream-8
+    # the default operation
     operation: start
+    # lists of operation values
     to_start:
       - start
       - restart
@@ -38,32 +44,39 @@
     to_remove:
       - finish
       - rebuild
+    # the 'current' is the value in the state file
+    # the default is no state
     current: ""
 
   tasks:
 
-    - name: Cached lesson
-      failed_when: false
-      ansible.builtin.slurp:
-        src: "{{ current_file }}"
-      register: current_lesson_file
+    # check if the state file exists
+    - name: Check current lesson state file
+      stat:
+        path: "{{ current_file }}"
+      register: current_state_file
       tags:
         - always
         - state
 
+    # read the state using a file lookup plugin
     - name: Current lesson
-      when: current_lesson_file is defined and current_lesson_file.content is defined
+      when: current_state_file.stat.exists
+      ignore_errors: true
       set_fact:
-        current: "{{ current_lesson_file.content | b64decode | trim }}"
+        current: "{{ lookup('file', current_file) }}"
       tags:
         - always
         - state
 
+    # if no state file and `lesson` not passed in
     - name: Check for a lesson
       when: current == "" and lesson is not defined
       fail:
         msg: "Must supply `lesson`"
 
+    # if lesson not passed in, then use the value
+    # from the state file
     - name: Check that some lesson exists
       when: lesson is not defined
       set_fact:
@@ -71,10 +84,12 @@
       tags:
         - always
 
+    # user feedback
     - name: This lesson
       debug:
         msg: "The lesson setup is {{ lesson }}"
 
+    # check if the current leasson has a playbook
     - name: Is there a provisioning playbook
       stat:
         path: "{{ lesson }}/_primer_provisioning.yml"
@@ -82,21 +97,25 @@
       tags:
         - vms
 
+    # load the nodes.yml file and place in `this` variable
     - name: Load new lesson nodes
       include_vars:
         file: "{{ playbook_dir }}/{{ lesson }}/_primer_nodes.yml"
         name: this
       tags:
-        - always
+        - vms
 
+    # load the nodes.yml file of the "current" lesson and
+    # place in `old` variable
     - name: Load current lesson nodes
       when: current != ""
       include_vars:
         file: "{{ playbook_dir }}/{{ current }}/_primer_nodes.yml"
         name: old
       tags:
-        - always
+        - vms
 
+    # generate a new SSH key pair
     - name: Generate SSH key
       community.crypto.openssh_keypair:
         path: "{{ ssh_keyfile }}"
@@ -108,6 +127,7 @@
       tags:
         - vms
 
+    # stop any containers specified in the current (`old`) nodes.yml
     - name: Stop the containers
       when: operation in (to_stop + to_remove) or current != lesson or sshkey is changed
       failed_when: false
@@ -120,6 +140,7 @@
       tags:
         - vms
 
+    # remove the custom images, if necessary
     - name: Remove the images
       when: operation in to_remove or (sshkey is defined and sshkey is changed)
       community.docker.docker_image:
@@ -130,6 +151,7 @@
       tags:
         - images
 
+    # remove the base images too, when finished with the lessons
     - name: Remove base images
       when: operation == 'finish'
       community.docker.docker_image:
@@ -139,18 +161,22 @@
       tags:
         - images
 
+    # build and tag the custom iamges
     - name: Build images
       when: operation in (to_build + to_start)
       tags:
         - images
       block:
 
+        # source==pull vs source==build
+        # for each entry in `images`
         - name: Pull base image
           community.docker.docker_image:
             name: "{{ item.image }}"
             source: pull
           loop: "{{ images }}"
 
+        # using setup/Dockerfile
         - name: Build docker images
           community.docker.docker_image:
             state: present
@@ -163,6 +189,9 @@
                 BASEIMAGE: "{{ item.image }}"
           loop: "{{ images }}"
 
+    # start the nodes for this lesson
+    # if the node has `altname`, use that instead of the
+    # constructed
     - name: Start docker containers
       when: operation in to_start
       community.docker.docker_container:
@@ -174,10 +203,6 @@
         labels: "{{ item.labels | default({}) | combine(local_labels) }}"
         stop_timeout: 100
         entrypoint: "{{ item.entrypoint | default(omit) }}"
-        mounts:
-          - type: tmpfs
-            target: /tmp
-        privileged: true
         exposed_ports: "{{ this.nodes.ports | default(omit) }}"
         container_default_behavior: no_defaults
       loop: "{{ this.nodes }}"
@@ -191,6 +216,7 @@
       tags:
         - vms
 
+    # add the new hosts to the inventory in the `newhosts` group
     - name: New hosts
       no_log: true
       when: item.invocation is defined
@@ -202,6 +228,7 @@
       tags:
         - vms
 
+    # save the lesson to the state file
     - name: Save lesson
       when: current != lesson and operation != 'finish'
       ansible.builtin.copy:
@@ -210,9 +237,10 @@
       tags:
         - state
 
+    # if we are finished, delete the state file
     - name: Cleanup
       when: operation == "finish"
-      file:
+      ansible.builtin.file:
         state: absent
         path: "{{ current_file }}"
       tags:
@@ -221,6 +249,8 @@
 - name: Post-creation provisioning
   hosts: newhosts
   tasks:
+    # if it exists, then run the provisioning task file
+    # found earlier
     - name: Per-lesson provision
       when: hostvars.localhost.provisioning.stat.exists
       ansible.builtin.include_tasks:
