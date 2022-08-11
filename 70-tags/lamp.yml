@@ -1,7 +1,7 @@
 ---
 
 - name: Set up a LAMP system
-  hosts: limits
+  hosts: tags 
   pre_tasks:
     - name: Install python-apt
       become: true
