@@ -9,7 +9,7 @@
 
 # show a variable installed in a play
 - name: Play variables
-  hosts: 20-variables-centos
+  hosts: variables-centos
   gather_facts: false
   vars:
     app: cat
@@ -21,7 +21,7 @@
 
 # show a variable from a vars file in the play
 - name: Play varsfiles
-  hosts: 20-variables-amazon
+  hosts: variables-amazon
   gather_facts: false
   vars_files:
     - vars/system-amazon.yml
@@ -34,7 +34,7 @@
 # show a variable from a vars file included
 # as a task
 - name: Play include_vars
-  hosts: 20-variables-ubuntu
+  hosts: variables-ubuntu
   gather_facts: false
   tasks:
     - name: Load local variables
