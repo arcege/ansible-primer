@@ -9,7 +9,7 @@
 
 # show a variable installed in a play
 - name: Play variables
-  hosts: variables-centos
+  hosts: variables-rocky
   gather_facts: false
   vars:
     app: cat

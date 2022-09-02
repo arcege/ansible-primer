@@ -4,8 +4,8 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: centos
-    image: centos:8
+  - name: rocky
+    image: rockylinux/rockylinux
     groups:
       - inventory
   - name: ubuntu

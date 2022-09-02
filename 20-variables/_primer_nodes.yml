@@ -5,7 +5,7 @@ name: 'variables'
 nodes:
   - name: ubuntu
     image: primer-ubuntu
-  - name: centos
-    image: primer-centos
+  - name: rocky
+    image: primer-rocky
   - name: amazon
     image: primer-amazon

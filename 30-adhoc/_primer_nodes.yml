@@ -7,5 +7,5 @@ nodes:
     image: primer-ubuntu
   - name: amazon
     image: primer-amazon
-  - name: centos
-    image: primer-centos
+  - name: rocky
+    image: primer-rocky

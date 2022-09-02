@@ -17,11 +17,11 @@ nodes:
     group: webapp
   - name: dbsvr1
     altname: dbsvr1
-    image: primer-centos
+    image: primer-rocky
     group: database
   - name: dbsvr2
     altname: dbsvr2
-    image: primer-centos
+    image: primer-rocky
     group: database
   - name: dns01
     altname: dns01

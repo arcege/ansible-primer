@@ -16,7 +16,7 @@ keyed_groups:
   # create groups based on the docker image used,
   # the group name is prefixed with `image_`
   # and as mentioned above, hyphens are translated
-  # for example, `image_primer_centos`
+  # for example, `image_primer_rocky`
   - prefix: image
     key: docker_config.Image
 

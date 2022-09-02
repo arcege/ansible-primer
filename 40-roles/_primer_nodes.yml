@@ -4,13 +4,13 @@ name: 'roles'
 
 nodes:
   - name: nginx1
-    image: primer-centos
+    image: primer-rocky
     group: webapp
   - name: nginx2
     image: primer-ubuntu
     group: webapp
   - name: redis1
-    image: primer-centos
+    image: primer-rocky
     group: database
   - name: redis2
     image: primer-ubuntu

@@ -27,9 +27,8 @@
         image: ubuntu:focal
       - name: primer-amazon
         image: amazonlinux:2
-      - name: primer-centos
-        image: dokken/centos-stream-8
-    # the default operation
+      - name: primer-rocky
+        image: rockylinux/rockylinux
     operation: start
     # lists of operation values
     to_start:
