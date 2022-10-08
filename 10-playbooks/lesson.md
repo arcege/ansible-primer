@@ -37,9 +37,14 @@ With the exception of handlers, the name of playbooks, plays and tasks are _only
 for human consumption.  It can be any string with any content.  It can also include
 (templated) variables.  The name can help more correctly identify the task being
 performed, especially when there are multiple in succession.  Otherwise tasks are
+unaffected by the name value.
 
 The `notify` task attribute must match the name of a handler.  This is the only
 time the `name` attribute is required.
+
+Templates names are evaluated at the start of the execution.  If the template cannot
+be evaluated, the template is left as is.  This means that loop variables in the task
+cannot be used in the template.
 
 ### Hosts
 
