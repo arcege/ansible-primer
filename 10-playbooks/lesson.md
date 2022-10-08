@@ -48,7 +48,7 @@ cannot be used in the template.
 
 ### Hosts
 
-The `hosts` is a sequence of hosts or groups.  Seperation delimitors are semi-colons,
+The `hosts` is a sequence of hosts or groups.  Seperation delimitors are colons,
 commas and exclaimation points.  Semi-colons and commas are equivalent.  An
 exclaimation point excludes hosts from the sequence.  For example:
 
