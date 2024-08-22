@@ -14,7 +14,7 @@
 - name: Setup containers for lesson
   hosts: localhost
   connection: local
-  gather_facts: false
+  gather_facts: true
   vars:
     # our 'state' file
     current_file: "{{ playbook_dir }}/.current"
@@ -24,11 +24,17 @@
     # the base images are standard from Docker Hub
     images:
       - name: primer-ubuntu
-        image: ubuntu:focal
+        image:
+          arm64: arm64v8/ubuntu
+          x86_64: ubuntu:focal
       - name: primer-amazon
-        image: amazonlinux:2
+        image:
+          arm64: arm64v8/amazonlinux:2
+          x86_64: amazonlinux:2
       - name: primer-rocky
-        image: rockylinux/rockylinux
+        image:
+          arm64: arm64v8/rockylinux:9.3
+          x86_64: rockylinux/rockylinux
     operation: start
     # lists of operation values
     to_start:
@@ -48,6 +54,11 @@
     current: ""
 
   tasks:
+
+    # show CPU architect of localhost
+    - name: CPU type
+      ansible.builtin.debug:
+        var: ansible_machine
 
     # check if the state file exists
     - name: Check current lesson state file
@@ -155,7 +166,7 @@
       when: operation == 'finish'
       community.docker.docker_image:
         state: absent
-        name: "{{ item.image }}"
+        name: "{{ item['image'][ansible_machine] }}"
       loop: "{{ images }}"
       tags:
         - images
@@ -171,7 +182,7 @@
         # for each entry in `images`
         - name: Pull base image
           community.docker.docker_image:
-            name: "{{ item.image }}"
+            name: "{{ item['image'][ansible_machine] }}"
             source: pull
           loop: "{{ images }}"
 
@@ -185,7 +196,7 @@
             build:
               path: "setup"
               args:
-                BASEIMAGE: "{{ item.image }}"
+                BASEIMAGE: "{{ item['image'][ansible_machine] }}"
           loop: "{{ images }}"
 
     # start the nodes for this lesson
